@@ -15,7 +15,7 @@ Options:
     -z          直达
 
 Example:
-    tickets beijing shanghai 2016-08-25
+    tickets 北京 上海 2016-08-25
 """
 from docopt import docopt
 from prettytable import PrettyTable
