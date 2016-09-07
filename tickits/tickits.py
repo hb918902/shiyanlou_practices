@@ -135,17 +135,18 @@ def cli():
     url = 'https://kyfw.12306.cn/otn/lcxxcx/query?purpose_codes=ADULT&queryDate={}&from_station={}&to_station={}'.format(
         date, from_station, to_station)
     r = requests.get(url,verify=False)
-    rows = r.json()['data']['datas']
-    if commandflag:
-        rows = filter(lambda x:re.match(commandflag,x['station_train_code']),rows)
-    # print(rows)
     try:
+        rows = r.json()['data']['datas']
+        if commandflag:
+            rows = filter(lambda x:re.match(commandflag,x['station_train_code']),rows)
         trains = TrainCollection(rows)
         trains.pretty_print()
     except ValueError:
         print("服务器错误，请重试！")
     except TypeError:
         print("输入错误，请重试")
+    except KeyError:
+        print("没有符合条件的数据")
 
 
 if __name__ == '__main__':
