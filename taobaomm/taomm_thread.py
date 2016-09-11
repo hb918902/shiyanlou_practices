@@ -3,6 +3,7 @@
 
 from selenium import webdriver
 from bs4 import BeautifulSoup
+from multiprocessing.dummy import Pool as TreadPool
 import urllib.request
 import re
 import os
@@ -26,24 +27,31 @@ def getperMM(MMURL,MMpath):
     MMimages = soup.find_all('img')
     cnt = 1
     for MMimage in MMimages:
-        try:
-            urllib.request.urlretrieve("https:"+MMimage['src'].lstrip(),MMpath+"/"+str(cnt)+'.jpg')
-            print(str(cnt),end=";")
+        if os.path.exists(MMpath+"/"+str(cnt)+'.jpg'):
             cnt += 1
-        except urllib.request.URLError:
-            print("https:"+MMimage['src'])
-        except KeyError as e:
-            print(e,"this is an error")
+            print('*!',end='')
+        else:
+            try:
+                urllib.request.urlretrieve("https:"+MMimage['src'].lstrip(),MMpath+"/"+str(cnt)+'.jpg')
+                print(str(cnt),end=";")
+                cnt += 1
+            except (urllib.request.URLError,KeyError) as e:
+                print(e)
+                continue
+            # if cnt >5:
+            #     break
+    print(os.linesep+MMpath+' 已完成!')
 
 
-def main():
+def index():
     driver = webdriver.Firefox(executable_path='/usr/bin/firefox') # 使用firefox浏览器
     driver.get("https://mm.taobao.com/search_tstar_model.htm?")
     bsobj = BeautifulSoup(driver.page_source,'lxml')
-    fp = open('mm.txt','w+')
-    fp.write(driver.find_element_by_id('J_GirlsList').text)
-    fp.close()
-    print("get MM's index")
+    if not os.path.exists(os.getcwd()+'/'+'mm.txt'):
+        fp = open('mm.txt','w+')
+        fp.write(driver.find_element_by_id('J_GirlsList').text)
+        fp.close()
+        print("get MM's index")
     # MMsinfoUrl链接地址  imagesUrl封面图片
     MMsinfoUrl = bsobj.findAll("a",{"href":re.compile("\/\/.*\.htm\?(userId=)\d*")})
     # imagesUrl = bsobj.findAll("img",{"data-ks-lazyload":re.compile(".*\.jpg")})
@@ -63,17 +71,22 @@ def main():
         content2.append(MMurl["href"])
     # print(content2)
     contents = [[a,b] for a,b in zip(content1,content2)]
-    # print(contents)
-    for i in range(len(contents)):
-        print("MM's name is :"+contents[i][0][0]+" with "+contents[i][0][1])
-        perMMurl = "https:"+contents[i][1]  # 创建链接地址path
-        path = os.getcwd()+'/'+contents[i][0][0]
-        makedir(path)
-        getperMM(perMMurl,path)
+    return contents
+
+
+def content_process(content):
+    print("MM's name is :"+content[0][0]+" with "+content[0][1])
+    perMMurl = "https:"+content[1]  # 创建链接地址path
+    path = os.getcwd()+'/'+content[0][0]
+    makedir(path)
+    getperMM(perMMurl,path)
 
 
 if __name__ == "__main__":
-    main()
+    tpool = TreadPool(30)
+    tpool.map(content_process,index())
+    tpool.close()
+    print('Well Done')
 
 
 
