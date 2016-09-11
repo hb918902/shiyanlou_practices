@@ -31,8 +31,9 @@ def getperMM(MMURL,MMpath):
             cnt += 1
             print('*!',end='')
         else:
+
             try:
-                urllib.request.urlretrieve("https:"+MMimage['src'].lstrip(),MMpath+"/"+str(cnt)+'.jpg')
+                urllib.request.urlretrieve("https:"+MMimage['src'].lstrip(),MMpath+"/"+str(cnt)+MMimage['src'][-4:])
                 print(str(cnt),end=";")
                 cnt += 1
             except (urllib.request.URLError,KeyError,HTTPException,) as e:
