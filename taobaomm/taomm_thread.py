@@ -4,10 +4,10 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from multiprocessing.dummy import Pool as TreadPool
+from http.client import HTTPException
 import urllib.request
 import re
 import os
-
 
 def makedir(path):
     isExists = os.path.exists(path)
@@ -35,7 +35,7 @@ def getperMM(MMURL,MMpath):
                 urllib.request.urlretrieve("https:"+MMimage['src'].lstrip(),MMpath+"/"+str(cnt)+'.jpg')
                 print(str(cnt),end=";")
                 cnt += 1
-            except (urllib.request.URLError,KeyError) as e:
+            except (urllib.request.URLError,KeyError,HTTPException,) as e:
                 print(e)
                 continue
             # if cnt >5:
