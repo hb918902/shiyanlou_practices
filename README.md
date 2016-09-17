@@ -11,4 +11,4 @@ tickits
 taobaomm
 实验楼文档：https://www.shiyanlou.com/courses/595/labs/1970/document      
 实现效果：创建100个文件夹，总共大约30G      
-![image](https://www.github.com/hb918902/shiyanlou_practices/images/MM.png "github")
+![image](https://github.com/hb918902/shiyanlou_practices/images/MM.png )
